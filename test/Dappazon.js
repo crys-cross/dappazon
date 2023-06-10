@@ -52,4 +52,25 @@ describe("Dappazon", () => {
       expect(transaction).to.emit(dappazon, "List");
     });
   });
+  describe("Buying", () => {
+    let transaction;
+    beforeEach(async () => {
+      // list item
+      transaction = await dappazon
+        .connect(deployer)
+        .list(ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK);
+      await transaction.wait();
+      // buy item
+      transaction = await dappazon.connect(buyer).buy(ID, { value: COST });
+      await transaction.wait();
+    });
+    it("Updates the contract balance", async () => {
+      const result = await ethers.provider.getBalance(dappazon.address);
+      expect(result).to.equal(COST);
+    });
+    it("Updates buyer's order count", async () => {
+      const result = await dappazon.orderCount(dappazon.address);
+      expect(result).to.equal(1);
+    });
+  });
 });
