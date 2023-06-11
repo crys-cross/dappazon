@@ -24,6 +24,7 @@ contract Dappazon {
     mapping(address => mapping(uint256 => Order)) public orders;
 
     event List(string name, uint256 cost, uint256 quantity);
+    event Buy(address buyer, uint256 cost, uint256 quantity);
 
     modifier onlyOwner() {
         require(msg.sender == owner);
@@ -65,6 +66,11 @@ contract Dappazon {
         // receive crypto
         // fetch item
         Item memory item = items[_id];
+
+        // check if buyer is sending enough ether
+        require(msg.value >= item.cost);
+        // check item is in stock
+        require(item.stock >= 0);
         // create an order
         Order memory order = Order(block.timestamp, item);
         // add order for user
@@ -73,7 +79,12 @@ contract Dappazon {
         // subtract stock
         items[_id].stock = item.stock - 1;
         // emit event
+        emit Buy(msg.sender, orderCount[msg.sender], item.id);
     }
 
     // withdraw funds
+    function withdraw() public onlyOwner {
+        (bool success, ) = owner.call{value: address(this).balance}("");
+        require(success);
+    }
 }
