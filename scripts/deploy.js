@@ -18,6 +18,23 @@ async function main() {
   await dappazon.deployed();
 
   console.log(`Deployed Dappazon Contract at: ${dappazon.address}\n`);
+
+  // Listing items. . .
+  for (let i = 0; i < items.length; i++) {
+    const tx = await dappazon
+      .connect(deployer)
+      .list(
+        items[i].id,
+        items[i].name,
+        items[i].category,
+        items[i].image,
+        tokens(items[i].price),
+        items[i].rating,
+        items[i].stock
+      );
+    await tx.wait;
+    console.log(`Listed item ${items[i].id}: ${items[i].name}`);
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
