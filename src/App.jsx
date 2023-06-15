@@ -19,6 +19,11 @@ function App() {
   const [provider, setProvider] = useState(null);
   const [contract, setContract] = useState(null);
   const [account, setAccount] = useState(null);
+  const [electronics, setElectronics] = useState(null);
+  const [clothing, setClothing] = useState(null);
+  const [toys, setToys] = useState(null);
+  const [item, setItem] = useState({});
+  const togglePop = () => {};
 
   const loadBlockchainData = async () => {
     // connest to blockchain
@@ -30,10 +35,21 @@ function App() {
     const address = config[network.chainId].dappazon.address;
     const abi = Dappazon;
     // connect to smart contracts(Create JS Versions)
-    const dappazon = new ethers.Contract(address, abi, signerOrProvider);
-    setContract(dappazon);
+    contract = new ethers.Contract(address, abi, signerOrProvider);
+    setContract(contract);
     // Load products
     const items = [];
+    for (let i = 0; i < 9; i++) {
+      const item = await dappazon.items(i + 1);
+      items.push(item);
+    }
+    const electronics = items.filter((item) => item.category === "electronics");
+    const clothing = items.filter((item) => item.category === "clothing");
+    const toys = items.filter((item) => item.category === "toys");
+
+    setElectronics(electronics);
+    setClothing(clothing);
+    setToys(toys);
   };
 
   useEffect(() => {
@@ -44,6 +60,25 @@ function App() {
     <div>
       <Navigation account={account} setAccount={setAccount} />
       <h2>Dappazon Best Sellers</h2>
+      {electronics && clothing && toys && (
+        <>
+          <Section
+            tittle={"Clothing & Jewelry"}
+            items={clothing}
+            togglePop={togglePop}
+          />
+          <Section
+            tittle={"Electronics & Gadgets"}
+            items={electronics}
+            togglePop={togglePop}
+          />
+          <Section
+            tittle={"Toys & Gaming"}
+            items={toys}
+            togglePop={togglePop}
+          />
+        </>
+      )}
     </div>
   );
 }
