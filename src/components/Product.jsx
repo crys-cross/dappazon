@@ -7,7 +7,11 @@ import Rating from "./Rating";
 import close from "../assets/close.svg";
 
 const Product = ({ item, provider, account, dappazon, togglePop }) => {
-  const buyHandler = async () => {};
+  const [order, setOrder] = useState(null);
+  const buyHandler = async () => {
+    const signer = await provider.getSigner();
+    let tx = dappazon.connect(signer).buy(item.id, { value: item.cost });
+  };
   return (
     <div className="product">
       <div className="product__details">
@@ -46,7 +50,25 @@ const Product = ({ item, provider, account, dappazon, togglePop }) => {
           <p>
             <small>Sold by</small>Dappazon
           </p>
+          {order && (
+            <div className="product__bought">
+              Item bought on <br />
+              <strong>
+                {new Date(
+                  Number(order.time.toString() + "000")
+                ).toLocaleDateString(undefined, {
+                  weekday: "long",
+                  hour: "numeric",
+                  minute: "numeric",
+                  second: "numeric",
+                })}
+              </strong>
+            </div>
+          )}
         </div>
+        <button onClick={togglePop} className="product__close">
+          <img src={close} alt="Close" />
+        </button>
       </div>
     </div>
   );

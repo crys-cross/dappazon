@@ -10,7 +10,7 @@ import Product from "./components/Product";
 import Dappazon from "./abis/Dappazon.json";
 
 // Config
-import config from "./config.json";
+// import config from "./config.json";
 
 // address
 import config from "./config.json";
@@ -38,13 +38,14 @@ function App() {
     // const address = config[network]["dappazon"][0];
     const address = config[network.chainId].dappazon.address;
     const abi = Dappazon;
+    const signerOrProvider = provider;
     // connect to smart contracts(Create JS Versions)
     contract = new ethers.Contract(address, abi, signerOrProvider);
     setContract(contract);
     // Load products
     const items = [];
     for (let i = 0; i < 9; i++) {
-      const item = await dappazon.items(i + 1);
+      const item = await contract.items(i + 1);
       items.push(item);
     }
     const electronics = items.filter((item) => item.category === "electronics");
@@ -88,7 +89,7 @@ function App() {
           item={item}
           provider={provider}
           account={account}
-          dappazon={dappazon}
+          dappazon={contract}
           togglePop={togglePop}
         />
       )}
